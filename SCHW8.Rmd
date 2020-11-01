@@ -1,0 +1,136 @@
+---
+title: "HW8"
+author: "John Rothen"
+date: "10/31/2020"
+output: pdf_document
+---
+
+
+# 5.3.3
+
+## 1.
+
+$dr(t) = \alpha(b-r(t))dt + \sigma dW(t)$ which means we can write the following : $dr(t)*\Delta =\Delta(\alpha(b-r(t))dt + \sigma dW(t))$. Thus $r(t+\Delta) = r(t) + \Delta dr(t)$. Which can be written as $r(t)+ \Delta(\alpha(b-r(t))dt + \sigma dW(t))$, which simplifies to $r(t+\Delta) = e^{-\alpha\Delta}r(t) + b(1-e^{-\alpha\Delta}) +\sigma*(1-e^{-2\alpha\Delta})Z/(2\alpha)^.5$, which comes from the simplification of the Wiener Process.
+
+## 2.
+
+To save file space, these graphs are left as comments. Otherwise the pdf file is too large for git uploading.
+
+```{r}
+set.seed(123221)
+my.ou <- function(alpha,sigma,b,r0, Time, delta){
+  n = Time/delta
+  vect <- rep(0,n)
+  vect[1] <- r0
+  deltv <- seq(0,Time, delta)
+  z <- rnorm(n,0,1)
+  for (i in 1:n){
+    vect[i+1] <- (exp((-1*alpha*delta))*vect[i]) + (b*(1-exp(-1*alpha*delta))) + ((sigma/sqrt(2*alpha))*sqrt((1-exp(-2*alpha*delta)))*z[i])
+  }
+  return(vect)
+}
+
+
+r0<- 1
+Time<- 500
+delta <- 1/500
+
+# Each graph is given below, with the inputs given before the graph as
+# alpha/ sigma/b
+
+#Graphs are given in groups with same alpha/sigma, with the
+#the first having b=-5, and the second b=5
+
+par(mfrow=c(1,2))
+#.1,.1,-5
+plot(my.ou(.1,.1,-5,r0,Time,delta), ylab = "r(t)")
+# .1, .1, 5
+plot(my.ou(.1,.1,5,r0,Time,delta), ylab = "r(t)")
+# .1, .2, -5
+#plot(my.ou(.1,.2,-5,r0,Time,delta), ylab = "r(t)")
+
+# .1, .2, 5
+#plot(my.ou(.1,.2,5,r0,Time,delta), ylab = "r(t)")
+# .1, .5, -5
+#plot(my.ou(.1,.5,-5,r0,Time,delta), ylab = "r(t)")
+# .1, .5, 5
+#plot(my.ou(.1,.5,5,r0,Time,delta), ylab = "r(t)")
+# 1, .1, -5
+#plot(my.ou(1,.1,-5,r0,Time,delta), ylab = "r(t)")
+# 1, .1, 5
+#plot(my.ou(1,.1,5,r0,Time,delta), ylab = "r(t)")
+# 1, .2, -5
+#plot(my.ou(1,.2,-5,r0,Time,delta), ylab = "r(t)")
+# 1, .2, 5
+#plot(my.ou(1,.2,5,r0,Time,delta), ylab = "r(t)")
+# 1, .5, -5
+#plot(my.ou(1,.5,-5,r0,Time,delta), ylab = "r(t)")
+# 1, .5, 5
+#plot(my.ou(1,.5,5,r0,Time,delta), ylab = "r(t)")
+# 5, .1, -5
+#plot(my.ou(5,.1,-5,r0,Time,delta), ylab = "r(t)")
+# 5, .1, 5
+#plot(my.ou(5,.1,5,r0,Time,delta), ylab = "r(t)")
+# 5, .2, -5
+#plot(my.ou(5,.2,-5,r0,Time,delta), ylab = "r(t)")
+# 5, .2, 5
+#plot(my.ou(5,.2,5,r0,Time,delta), ylab = "r(t)")
+# 5, .5, -5
+plot(my.ou(5,.5,-5,r0,Time,delta), ylab = "r(t)")
+# 5, .5, 5
+plot(my.ou(5,.5,5,r0,Time,delta), ylab = "r(t)")
+```
+
+It appears that as sigma increases, the variance of r(t) is much larger about the value of b. As alpha increases, the value of r(t) reaches it's mean much faster (consider the final graph, where it reaches 5 much faster than other levels of alpha).
+
+## 3.
+
+```{r}
+set.seed(56)
+ou.sim <- function(alpha, sigma,b,r0,Time, delta){
+  n = Time/delta
+  vect <- rep(0,n)
+  vect[1] <- r0
+  deltv <- seq(0,Time, delta)
+  sd <- sigma*delta
+  for(i in 1:n){
+    m <- vect[i] + alpha*(b - vect[i])*delta
+    vect[i+1] <- rnorm(1,m, sd)
+  }
+  return(vect)
+}
+
+r0<- 1
+
+#delta =  1 
+delta <- 1
+Time <- 1000*delta
+d1<-ou.sim(1,.1,1,r0,Time,delta)
+par(mfrow=c(1,2))
+
+plot(density(d1), main = "Simulation Delta=1")
+plot(density(my.ou(1,.1,1,r0,Time,delta)), main="Real")
+
+
+#delta =  .5
+delta <- .5
+Time <- 1000*delta
+plot(density(ou.sim(1,.1,1,r0,Time,delta)),  main= "Simulation Delta=.5")
+plot(density(my.ou(1,.1,1,r0,Time,delta)), main="Real")
+
+
+#delta = .1
+delta <- .1
+Time <- 1000*delta
+plot(density(ou.sim(1,.1,1,r0,Time,delta)),  main= "Simulation Delta = .1")
+plot(density(my.ou(1,.1,1,r0,Time,delta)), main="Real")
+
+
+#delta=.01
+delta <- .01
+Time <- 1000*delta
+plot(density(ou.sim(1,.1,1,r0,Time,delta)),  main= "Simulation Delta = .01")
+plot(density(my.ou(1,.1,1,r0,Time,delta)), main="Real")
+
+
+```
