@@ -134,3 +134,45 @@ plot(density(my.ou(1,.1,1,r0,Time,delta)), main="Real")
 
 
 ```
+
+
+# 5.3.4
+
+## 1
+
+```{r}
+poisproc <- function(t){
+  x <- sqrt(t) + (exp(-t)*sin(2*pi*t))
+  return(x)
+}
+
+poismean<-integrate(poisproc, 0,5)
+
+#~~~ deltafunc(5) - deltafunc(0)
+```
+
+The distribution of N(5) is Poisson with mean `r poismean$value`. This comes from the fact that for inhomogeneous Poisson Processes, the number of events (0,t] is Poisson RV with mean = $\int_0^5 \lambda(t)dt$. 
+
+## 2 and 3
+
+```{r}
+## simulation of a nonhomegeneous Poisson process
+## via thinning method
+set.seed(4565475)
+rnhpp <- function(intensity, intmax, tmax) {
+    n <- rpois(1, intmax)
+    tt <- runif(n, 0, tmax)
+    u <- runif(n)
+    accept <- u < intensity(tt) / intmax
+    sort(tt[accept])
+}
+
+intmax<-integrate(poisproc, 0,5)$value
+tmax<- 5
+
+tempf <- function(t){poisproc(t)/poismean$value} #reference function for graphing
+
+set1<- unlist(replicate(1000,rnhpp(poisproc, intmax,tmax)))
+plot(density(set1), xlim=c(0,5), main= "Black is simulation, Green is the function")
+plot(tempf, col="green", xlim=c(0,5), add=TRUE)
+```
